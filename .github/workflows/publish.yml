@@ -81,5 +81,5 @@ jobs:
           if npm view "${CLI_NAME}@${CLI_VERSION}" version >/dev/null 2>&1; then
             echo "${CLI_NAME}@${CLI_VERSION} already published. Skipping."
           else
-            npm publish --workspace betterbrowse --access public --provenance
+            npm publish --workspace @amac84/betterbrowse --access public --provenance
           fi

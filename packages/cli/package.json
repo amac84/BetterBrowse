@@ -1,5 +1,5 @@
 {
-  "name": "betterbrowse",
+  "name": "@amac84/betterbrowse",
   "version": "0.1.2",
   "description": "CLI-native web app auditor for React and Next.js projects",
   "license": "MIT",

@@ -1,11 +1,11 @@
-# betterbrowse
+# @amac84/betterbrowse
 
 CLI-native web app auditor for React and Next.js projects.
 
 ## Install
 
 ```bash
-npm install --save-dev betterbrowse
+npm install --save-dev @amac84/betterbrowse
 ```
 
 ## Usage

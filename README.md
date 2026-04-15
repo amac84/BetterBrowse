@@ -13,7 +13,7 @@ It opens your running app with Playwright, audits configured routes/viewports, a
 ## Install (Consumers)
 
 ```bash
-npm install --save-dev betterbrowse
+npm install --save-dev @amac84/betterbrowse
 ```
 
 Then run:
@@ -35,7 +35,7 @@ npm run typecheck
 
 ## Publishing
 
-BetterBrowse is a two-package publish (`@amac84/betterbrowse-core` and `betterbrowse`).
+BetterBrowse is a two-package publish (`@amac84/betterbrowse-core` and `@amac84/betterbrowse`).
 
 Use the workspace scripts from repo root:
 
@@ -45,7 +45,7 @@ npm run release:pack
 npm run release:publish
 ```
 
-`release:publish` publishes core first, then CLI, so `npm install betterbrowse` resolves dependencies correctly.
+`release:publish` publishes core first, then CLI, so `npm install @amac84/betterbrowse` resolves dependencies correctly.
 
 ## GitHub Actions
 
@@ -56,6 +56,6 @@ This repo now includes:
 
 To enable publishing from GitHub Actions:
 
-1. Add repository secret `NPM_TOKEN` (an npm automation token with publish access to `@amac84/betterbrowse-core` and `betterbrowse`).
+1. Add repository secret `NPM_TOKEN` (an npm automation token with publish access to `@amac84/betterbrowse-core` and `@amac84/betterbrowse`).
 2. Bump versions in `packages/core/package.json` and `packages/cli/package.json`.
 3. Push a tag like `v0.1.1` or run the publish workflow manually.

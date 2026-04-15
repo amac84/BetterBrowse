@@ -14,7 +14,7 @@
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "release:check": "npm run typecheck && npm test",
-    "release:pack": "npm run build && npm pack --dry-run --workspace @amac84/betterbrowse-core && npm pack --dry-run --workspace betterbrowse",
-    "release:publish": "npm run release:check && npm run build && npm publish --workspace @amac84/betterbrowse-core --access public && npm publish --workspace betterbrowse --access public"
+    "release:pack": "npm run build && npm pack --dry-run --workspace @amac84/betterbrowse-core && npm pack --dry-run --workspace @amac84/betterbrowse",
+    "release:publish": "npm run release:check && npm run build && npm publish --workspace @amac84/betterbrowse-core --access public && npm publish --workspace @amac84/betterbrowse --access public"
   }
 }
