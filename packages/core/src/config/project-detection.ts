@@ -1,7 +1,9 @@
+import { promises as fs } from "fs";
+import type { Dirent } from "fs";
 import path from "path";
 
 import { DEFAULT_COMPONENT_ROOT_CANDIDATES } from "../defaults";
-import type { FrameworkType, InitProjectResult, StyleSystemConfig } from "../types";
+import type { FrameworkType, StyleSystemConfig } from "../types";
 import { fileExists, readJsonFile, toPosixPath, walkFiles } from "../utils/fs";
 
 type PackageJson = {
@@ -19,13 +21,37 @@ export interface ProjectDetectionResult {
 }
 
 const JS_EXTENSIONS = [".tsx", ".ts", ".jsx", ".js"];
+const HTML_EXTENSIONS = [".html", ".htm"];
+const HTML_ROUTE_IGNORED_DIRECTORIES = new Set([
+  ".git",
+  ".next",
+  ".betterbrowse",
+  "node_modules",
+  "dist",
+  "build",
+  "out",
+  "coverage"
+]);
+const NON_HTML_FRAMEWORK_DEPENDENCIES = [
+  "vue",
+  "svelte",
+  "@angular/core",
+  "solid-js",
+  "preact",
+  "astro",
+  "nuxt",
+  "gatsby",
+  "@remix-run/react",
+  "@builder.io/qwik"
+];
 
 export async function detectProject(projectRoot: string): Promise<ProjectDetectionResult> {
   const packageJsonPath = path.join(projectRoot, "package.json");
   const packageJson = (await readJsonFile<PackageJson>(packageJsonPath)) ?? {};
-  const framework = detectFramework(packageJson);
+  const htmlRoutes = await detectHtmlRoutes(projectRoot);
+  const framework = detectFramework(packageJson, htmlRoutes.length > 0);
   const styleSystem = await detectStyleSystem(projectRoot, packageJson);
-  const routes = await detectRoutes(projectRoot, framework);
+  const routes = await detectRoutes(projectRoot, framework, htmlRoutes);
   const componentRoots = await detectComponentRoots(projectRoot);
 
   return {
@@ -37,7 +63,7 @@ export async function detectProject(projectRoot: string): Promise<ProjectDetecti
   };
 }
 
-function detectFramework(packageJson: PackageJson): FrameworkType {
+function detectFramework(packageJson: PackageJson, hasStaticHtmlRoutes: boolean): FrameworkType {
   const dependencies = {
     ...packageJson.dependencies,
     ...packageJson.devDependencies
@@ -51,14 +77,18 @@ function detectFramework(packageJson: PackageJson): FrameworkType {
     return "react";
   }
 
+  if (!hasKnownFrameworkDependency(dependencies) && hasStaticHtmlRoutes) {
+    return "html";
+  }
+
   return "unknown";
 }
 
 function detectBaseUrl(framework: FrameworkType, packageJson: PackageJson): string {
   const scripts = packageJson.scripts ?? {};
-  const scriptValues = Object.values(scripts).join(" ");
+  const scriptValues = Object.values(scripts).join(" ").toLowerCase();
 
-  if (framework === "react" && scriptValues.includes("vite")) {
+  if ((framework === "react" || framework === "html") && scriptValues.includes("vite")) {
     return "http://localhost:5173";
   }
 
@@ -78,8 +108,13 @@ async function detectStyleSystem(projectRoot: string, packageJson: PackageJson):
     "tailwind.config.cjs",
     "src/app/globals.css",
     "app/globals.css",
+    "index.css",
+    "styles.css",
+    "style.css",
     "src/index.css",
-    "src/styles/globals.css"
+    "src/styles/globals.css",
+    "public/styles.css",
+    "public/style.css"
   ];
 
   const entryPoints: string[] = [];
@@ -102,7 +137,7 @@ async function detectStyleSystem(projectRoot: string, packageJson: PackageJson):
   };
 }
 
-async function detectRoutes(projectRoot: string, framework: FrameworkType): Promise<string[]> {
+async function detectRoutes(projectRoot: string, framework: FrameworkType, htmlRoutes: string[]): Promise<string[]> {
   if (framework === "next") {
     const appRoutes = await detectNextAppRoutes(projectRoot);
     const pageRoutes = await detectNextPagesRoutes(projectRoot);
@@ -122,7 +157,62 @@ async function detectRoutes(projectRoot: string, framework: FrameworkType): Prom
     }
   }
 
+  if (htmlRoutes.length > 0) {
+    return htmlRoutes;
+  }
+
   return [];
+}
+
+async function detectHtmlRoutes(projectRoot: string): Promise<string[]> {
+  const htmlFiles = await walkHtmlFiles(projectRoot);
+  const routes = htmlFiles
+    .map((filePath) => htmlFileToRoute(projectRoot, filePath))
+    .filter((route): route is string => Boolean(route));
+  return dedupeRoutes(routes);
+}
+
+async function walkHtmlFiles(directoryPath: string): Promise<string[]> {
+  let entries: Dirent[];
+  try {
+    entries = await fs.readdir(directoryPath, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+
+  const files: string[] = [];
+  for (const entry of entries) {
+    const absolutePath = path.join(directoryPath, entry.name);
+    if (entry.isDirectory()) {
+      if (HTML_ROUTE_IGNORED_DIRECTORIES.has(entry.name)) {
+        continue;
+      }
+
+      files.push(...(await walkHtmlFiles(absolutePath)));
+      continue;
+    }
+
+    if (!entry.isFile()) {
+      continue;
+    }
+
+    if (HTML_EXTENSIONS.includes(path.extname(entry.name).toLowerCase())) {
+      files.push(absolutePath);
+    }
+  }
+
+  return files;
+}
+
+function htmlFileToRoute(projectRoot: string, filePath: string): string | null {
+  const relativeFilePath = toPosixPath(path.relative(projectRoot, filePath));
+  if (!relativeFilePath || relativeFilePath.startsWith("..")) {
+    return null;
+  }
+
+  const withoutExtension = relativeFilePath.replace(/\.(html|htm)$/i, "");
+  const route = `/${withoutExtension.replace(/\/index$/i, "").replace(/^index$/i, "")}`.replace(/\/+/g, "/");
+  return route === "/" ? "/" : route.replace(/\/$/, "");
 }
 
 async function detectNextAppRoutes(projectRoot: string): Promise<string[]> {
@@ -204,6 +294,10 @@ async function detectComponentRoots(projectRoot: string): Promise<string[]> {
   }
 
   return componentRoots;
+}
+
+function hasKnownFrameworkDependency(dependencies: Record<string, string>): boolean {
+  return NON_HTML_FRAMEWORK_DEPENDENCIES.some((dependency) => Boolean(dependencies[dependency]));
 }
 
 function dedupeRoutes(routes: string[]): string[] {

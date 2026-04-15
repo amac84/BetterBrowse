@@ -17,7 +17,7 @@ export const sourceMapSchema = z.object({
 
 export const betterBrowseConfigSchema = z.object({
   engine: z.literal("playwright"),
-  framework: z.enum(["next", "react", "unknown"]),
+  framework: z.enum(["next", "react", "html", "unknown"]),
   baseUrl: z.string().url(),
   viewports: z.array(viewportSchema).min(1),
   routes: z.array(z.string()).min(1),

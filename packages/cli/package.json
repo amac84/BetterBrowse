@@ -1,7 +1,7 @@
 {
   "name": "@amac84/betterbrowse",
   "version": "0.1.2",
-  "description": "CLI-native web app auditor for React and Next.js projects",
+  "description": "CLI-native web app auditor for React, Next.js, and static HTML projects",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -39,6 +39,7 @@
     "cli",
     "nextjs",
     "react",
+    "html",
     "accessibility"
   ],
   "dependencies": {

@@ -1,6 +1,6 @@
 # @amac84/betterbrowse
 
-CLI-native web app auditor for React and Next.js projects.
+CLI-native web app auditor for React, Next.js, and static HTML projects.
 
 ## Install
 

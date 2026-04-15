@@ -1,7 +1,7 @@
 # BetterBrowse
 A coding agent that reviews code by browsing live code and suggesting changes to coding agents.
 
-BetterBrowse is a CLI auditor for local React and Next.js apps.
+BetterBrowse is a CLI auditor for local React, Next.js, and static HTML apps.
 
 It opens your running app with Playwright, audits configured routes/viewports, and reports practical UI/UX issues such as:
 
