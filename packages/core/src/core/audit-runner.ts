@@ -2,6 +2,7 @@ import path from "path";
 
 import { AlignmentAnalyzer } from "../analyzers/alignment-analyzer";
 import { AccessibilityAnalyzer } from "../analyzers/accessibility-analyzer";
+import { HeadingHierarchyAnalyzer } from "../analyzers/heading-hierarchy-analyzer";
 import { OverflowAnalyzer } from "../analyzers/overflow-analyzer";
 import { ReadabilityAnalyzer } from "../analyzers/readability-analyzer";
 import { SpacingAnalyzer } from "../analyzers/spacing-analyzer";
@@ -14,11 +15,13 @@ import type { Analyzer, AuditIssue, AuditRunOptions, AuditRunResult, RouteSummar
 import { ensureDir } from "../utils/fs";
 import { timestampId } from "../utils/hash";
 import { sortIssues } from "../utils/issues";
+import { resolveReachableBaseUrl } from "./base-url";
 import { PlaywrightAuditCollector } from "./collector";
 
 export async function auditProject(options: AuditRunOptions): Promise<AuditRunResult> {
   const config = await loadBetterBrowseConfig(options.projectRoot);
-  await assertBaseUrlReachable(config.baseUrl);
+  const baseUrlResolution = await resolveReachableBaseUrl(options.projectRoot, config.baseUrl);
+  const baseUrl = baseUrlResolution.resolvedBaseUrl;
 
   const paths = getBetterBrowsePaths(options.projectRoot);
   const runId = timestampId();
@@ -32,11 +35,12 @@ export async function auditProject(options: AuditRunOptions): Promise<AuditRunRe
     new SpacingAnalyzer(),
     new OverflowAnalyzer(),
     new AccessibilityAnalyzer(),
+    new HeadingHierarchyAnalyzer(),
     new ReadabilityAnalyzer()
   ];
 
   const engine = new PlaywrightBrowserEngine();
-  const collector = new PlaywrightAuditCollector(engine, config.baseUrl, screenshotDir);
+  const collector = new PlaywrightAuditCollector(engine, baseUrl, screenshotDir);
   const sourceMapper = new HeuristicSourceMapper();
   const routeSummaries: RouteSummary[] = [];
   const issuesById = new Map<string, AuditIssue>();
@@ -77,14 +81,20 @@ export async function auditProject(options: AuditRunOptions): Promise<AuditRunRe
     generatedAt: new Date().toISOString(),
     projectRoot: options.projectRoot,
     engine: config.engine,
-    baseUrl: config.baseUrl,
+    baseUrl,
     routes: routeSummaries,
     consoleSummary: summarizeConsole(routeSummaries),
     issues: sortIssues([...issuesById.values()])
   };
 
   const reportPath = await writeAuditReport(paths.reportsDir, paths.latestReportPath, report);
-  return { report, reportPath };
+  return {
+    report,
+    reportPath,
+    configuredBaseUrl: baseUrlResolution.configuredBaseUrl,
+    baseUrl,
+    autoDetectedBaseUrl: baseUrlResolution.autoDetected
+  };
 }
 
 export async function assertBaseUrlReachable(baseUrl: string): Promise<void> {

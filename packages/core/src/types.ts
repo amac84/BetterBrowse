@@ -1,5 +1,5 @@
 export type EngineName = "playwright";
-export type FrameworkType = "next" | "react" | "unknown";
+export type FrameworkType = "next" | "react" | "html" | "unknown";
 export type StyleSystemType = "tailwind" | "css" | "unknown";
 export type WriteMode = "diff-only" | "apply";
 export type AuditIssueType = "alignment" | "spacing" | "overflow" | "accessibility" | "readability" | "hierarchy";
@@ -262,6 +262,9 @@ export interface AuditRunOptions {
 export interface AuditRunResult {
   report: AuditReport;
   reportPath: string;
+  configuredBaseUrl: string;
+  baseUrl: string;
+  autoDetectedBaseUrl: boolean;
 }
 
 export interface InitProjectResult {
@@ -284,6 +287,16 @@ export interface FixRunResult {
   patch: PatchResult;
   beforeEvidence?: string;
   verification?: VerificationResult | null;
+}
+
+export interface DoctorResult {
+  configFound: boolean;
+  baseUrl?: string;
+  configuredBaseUrl?: string;
+  autoDetectedBaseUrl?: boolean;
+  reachable?: boolean;
+  routeCount?: number;
+  viewportCount?: number;
 }
 
 export interface UninstallResult {

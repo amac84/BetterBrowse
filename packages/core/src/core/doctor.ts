@@ -1,22 +1,17 @@
 import { loadBetterBrowseConfig } from "../config/load-config";
-import { assertBaseUrlReachable } from "./audit-runner";
-
-export interface DoctorResult {
-  configFound: boolean;
-  baseUrl?: string;
-  reachable?: boolean;
-  routeCount?: number;
-  viewportCount?: number;
-}
+import type { DoctorResult } from "../types";
+import { resolveReachableBaseUrl } from "./base-url";
 
 export async function doctorProject(projectRoot: string): Promise<DoctorResult> {
   try {
     const config = await loadBetterBrowseConfig(projectRoot);
     try {
-      await assertBaseUrlReachable(config.baseUrl);
+      const baseUrlResolution = await resolveReachableBaseUrl(projectRoot, config.baseUrl);
       return {
         configFound: true,
-        baseUrl: config.baseUrl,
+        baseUrl: baseUrlResolution.resolvedBaseUrl,
+        configuredBaseUrl: baseUrlResolution.configuredBaseUrl,
+        autoDetectedBaseUrl: baseUrlResolution.autoDetected,
         reachable: true,
         routeCount: config.routes.length,
         viewportCount: config.viewports.length
@@ -25,6 +20,8 @@ export async function doctorProject(projectRoot: string): Promise<DoctorResult> 
       return {
         configFound: true,
         baseUrl: config.baseUrl,
+        configuredBaseUrl: config.baseUrl,
+        autoDetectedBaseUrl: false,
         reachable: false,
         routeCount: config.routes.length,
         viewportCount: config.viewports.length

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { AlignmentAnalyzer } from "../src/analyzers/alignment-analyzer";
 import { AccessibilityAnalyzer } from "../src/analyzers/accessibility-analyzer";
+import { HeadingHierarchyAnalyzer } from "../src/analyzers/heading-hierarchy-analyzer";
 import { OverflowAnalyzer } from "../src/analyzers/overflow-analyzer";
 import { ReadabilityAnalyzer } from "../src/analyzers/readability-analyzer";
 import { SpacingAnalyzer } from "../src/analyzers/spacing-analyzer";
@@ -68,6 +69,22 @@ describe("BetterBrowse analyzers", () => {
     expect(issues.map((issue) => issue.description)).toContain("Interactive control does not expose an accessible name.");
   });
 
+  it("flags small touch targets for interactive controls", async () => {
+    const analyzer = new AccessibilityAnalyzer();
+    const context = createContext([
+      createNode({
+        selector: "#icon-button",
+        tagName: "button",
+        parentSelector: "#toolbar",
+        textPreview: "Menu",
+        bounds: { width: 24, height: 24 }
+      })
+    ]);
+
+    const issues = await analyzer.run(context);
+    expect(issues.some((issue) => issue.description.includes("recommended 44x44px touch target size"))).toBe(true);
+  });
+
   it("flags page-level overflow", async () => {
     const analyzer = new OverflowAnalyzer();
     const context = createContext([], {
@@ -129,6 +146,17 @@ describe("BetterBrowse analyzers", () => {
 
     const issues = await analyzer.run(context);
     expect(issues.some((issue) => issue.type === "readability" && issue.description.includes("too small"))).toBe(true);
+  });
+
+  it("flags heading hierarchy level skips", async () => {
+    const analyzer = new HeadingHierarchyAnalyzer();
+    const context = createContext([
+      createNode({ selector: "#title", tagName: "h1", parentSelector: "#main", textPreview: "Academy", bounds: { y: 16 } }),
+      createNode({ selector: "#module-title", tagName: "h3", parentSelector: "#main", textPreview: "Module", bounds: { y: 96 } })
+    ]);
+
+    const issues = await analyzer.run(context);
+    expect(issues.some((issue) => issue.type === "hierarchy" && issue.description.includes("skip from h1 to h3"))).toBe(true);
   });
 });
 

@@ -16,7 +16,7 @@ const program = new Command();
 
 program
   .name("betterbrowse")
-  .description("CLI-native web app auditor for React and Next.js projects.")
+  .description("CLI-native web app auditor for React, Next.js, and static HTML projects.")
   .version("0.1.0");
 
 program
@@ -76,7 +76,13 @@ program
       return;
     }
 
-    console.log(`Config found. Base URL: ${result.baseUrl}`);
+    const configuredBaseUrl = result.configuredBaseUrl ?? result.baseUrl;
+    if (result.autoDetectedBaseUrl && configuredBaseUrl && result.baseUrl && configuredBaseUrl !== result.baseUrl) {
+      console.log(`Config found. Base URL: ${configuredBaseUrl}`);
+      console.log(`Auto-detected running app URL: ${result.baseUrl}`);
+    } else {
+      console.log(`Config found. Base URL: ${result.baseUrl}`);
+    }
     console.log(`Reachable: ${result.reachable ? "yes" : "no"}`);
     console.log(`Configured routes: ${result.routeCount}`);
     console.log(`Configured viewports: ${result.viewportCount}`);
@@ -118,6 +124,9 @@ function printAuditSummary(result: AuditRunResult): void {
   }, {});
 
   console.log(`Saved report: ${result.reportPath}`);
+  if (result.autoDetectedBaseUrl && result.configuredBaseUrl !== result.baseUrl) {
+    console.log(`Auto-detected app URL: ${result.baseUrl} (configured ${result.configuredBaseUrl})`);
+  }
   console.log(`Routes audited: ${result.report.routes.length}`);
   console.log(`Issues found: ${result.report.issues.length}`);
   console.log(`High: ${issuesBySeverity.high ?? 0}  Medium: ${issuesBySeverity.medium ?? 0}  Low: ${issuesBySeverity.low ?? 0}`);
