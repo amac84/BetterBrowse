@@ -1,0 +1,40 @@
+{
+  "name": "betterbrowse",
+  "version": "0.1.0",
+  "description": "Run BetterBrowse audits and review local UI quality reports.",
+  "author": {
+    "name": "[TODO: Author Name]",
+    "email": "[TODO: author@example.com]",
+    "url": "[TODO: https://example.com]"
+  },
+  "homepage": "[TODO: https://example.com/betterbrowse]",
+  "repository": "[TODO: https://example.com/betterbrowse.git]",
+  "license": "MIT",
+  "keywords": [
+    "audit",
+    "playwright",
+    "ui",
+    "nextjs"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "BetterBrowse",
+    "shortDescription": "Audit local React and Next.js apps.",
+    "longDescription": "Launch a local browser, inspect routes, report conservative UI quality issues, and generate diff-first fixes.",
+    "developerName": "[TODO: Developer Name]",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "[TODO: https://example.com/betterbrowse]",
+    "privacyPolicyURL": "[TODO: https://example.com/privacy]",
+    "termsOfServiceURL": "[TODO: https://example.com/terms]",
+    "defaultPrompt": [
+      "Audit my local dashboard route with BetterBrowse.",
+      "Fix the highest-confidence spacing issue from the latest BetterBrowse report.",
+      "Summarize BetterBrowse findings for mobile layout problems."
+    ],
+    "brandColor": "#0F766E"
+  }
+}

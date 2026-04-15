@@ -1,0 +1,9 @@
+{
+  "name": "@betterbrowse/codex-plugin",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Placeholder Codex plugin package for BetterBrowse",
+  "files": [
+    ".codex-plugin"
+  ]
+}

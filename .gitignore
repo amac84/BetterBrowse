@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.betterbrowse/
+playwright-report/
+coverage/
+*.tsbuildinfo
