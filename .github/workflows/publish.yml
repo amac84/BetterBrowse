@@ -1,0 +1,83 @@
+name: Publish npm Packages
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Verify
+        run: npm run release:check
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish @betterbrowse/core (if needed)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          CORE_NAME="$(node -p "require('./packages/core/package.json').name")"
+          CORE_VERSION="$(node -p "require('./packages/core/package.json').version")"
+          if npm view "${CORE_NAME}@${CORE_VERSION}" version >/dev/null 2>&1; then
+            echo "${CORE_NAME}@${CORE_VERSION} already published. Skipping."
+          else
+            npm publish --workspace @betterbrowse/core --access public --provenance
+          fi
+
+      - name: Wait for core version to be available
+        shell: bash
+        run: |
+          set -euo pipefail
+          CORE_NAME="$(node -p "require('./packages/core/package.json').name")"
+          CORE_VERSION="$(node -p "require('./packages/core/package.json').version")"
+          for attempt in {1..20}; do
+            if npm view "${CORE_NAME}@${CORE_VERSION}" version >/dev/null 2>&1; then
+              echo "${CORE_NAME}@${CORE_VERSION} is available."
+              exit 0
+            fi
+            echo "Waiting for ${CORE_NAME}@${CORE_VERSION} to propagate to npm (${attempt}/20)..."
+            sleep 15
+          done
+          echo "Timed out waiting for ${CORE_NAME}@${CORE_VERSION} to become available on npm."
+          exit 1
+
+      - name: Publish betterbrowse (if needed)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          CLI_NAME="$(node -p "require('./packages/cli/package.json').name")"
+          CLI_VERSION="$(node -p "require('./packages/cli/package.json').version")"
+          if npm view "${CLI_NAME}@${CLI_VERSION}" version >/dev/null 2>&1; then
+            echo "${CLI_NAME}@${CLI_VERSION} already published. Skipping."
+          else
+            npm publish --workspace betterbrowse --access public --provenance
+          fi

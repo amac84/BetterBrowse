@@ -1,0 +1,44 @@
+{
+  "name": "betterbrowse",
+  "version": "0.1.1",
+  "description": "CLI-native web app auditor for React and Next.js projects",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "preferGlobal": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "betterbrowse": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "prepack": "npm run build",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "betterbrowse",
+    "ui",
+    "ux",
+    "audit",
+    "cli",
+    "nextjs",
+    "react",
+    "accessibility"
+  ],
+  "dependencies": {
+    "@betterbrowse/core": "^0.1.0",
+    "commander": "^13.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.17",
+    "typescript": "^5.8.3"
+  }
+}

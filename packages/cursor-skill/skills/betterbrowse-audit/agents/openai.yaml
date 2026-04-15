@@ -1,0 +1,7 @@
+interface:
+  display_name: "BetterBrowse Audit"
+  short_description: "Run BetterBrowse after frontend changes."
+  default_prompt: "Use $betterbrowse-audit to review the latest BetterBrowse findings and propose the smallest safe UI fix."
+
+policy:
+  allow_implicit_invocation: true

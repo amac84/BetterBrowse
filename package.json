@@ -1,0 +1,20 @@
+{
+  "name": "betterbrowse-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "description": "BetterBrowse monorepo workspace",
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "release:check": "npm run typecheck && npm test",
+    "release:pack": "npm run build && npm pack --dry-run --workspace @betterbrowse/core && npm pack --dry-run --workspace betterbrowse",
+    "release:publish": "npm run release:check && npm run build && npm publish --workspace @betterbrowse/core --access public && npm publish --workspace betterbrowse --access public"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "@betterbrowse/cursor-skill",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Placeholder Cursor/Codex skill package for BetterBrowse",
+  "files": [
+    "skills"
+  ]
+}
