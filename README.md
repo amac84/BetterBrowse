@@ -35,7 +35,7 @@ npm run typecheck
 
 ## Publishing
 
-BetterBrowse is a two-package publish (`@betterbrowse/core` and `betterbrowse`).
+BetterBrowse is a two-package publish (`@amac84/betterbrowse-core` and `betterbrowse`).
 
 Use the workspace scripts from repo root:
 
@@ -56,6 +56,6 @@ This repo now includes:
 
 To enable publishing from GitHub Actions:
 
-1. Add repository secret `NPM_TOKEN` (an npm automation token with publish access to `@betterbrowse/core` and `betterbrowse`).
+1. Add repository secret `NPM_TOKEN` (an npm automation token with publish access to `@amac84/betterbrowse-core` and `betterbrowse`).
 2. Bump versions in `packages/core/package.json` and `packages/cli/package.json`.
 3. Push a tag like `v0.1.1` or run the publish workflow manually.

@@ -10,7 +10,7 @@ import {
   uninstallProject,
   type AuditRunResult,
   type FixRunResult
-} from "@betterbrowse/core";
+} from "@amac84/betterbrowse-core";
 
 const program = new Command();
 

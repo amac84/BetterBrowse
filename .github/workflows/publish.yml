@@ -37,7 +37,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish @betterbrowse/core (if needed)
+      - name: Publish core package (if needed)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         shell: bash
@@ -48,7 +48,7 @@ jobs:
           if npm view "${CORE_NAME}@${CORE_VERSION}" version >/dev/null 2>&1; then
             echo "${CORE_NAME}@${CORE_VERSION} already published. Skipping."
           else
-            npm publish --workspace @betterbrowse/core --access public --provenance
+            npm publish --workspace @amac84/betterbrowse-core --access public --provenance
           fi
 
       - name: Wait for core version to be available

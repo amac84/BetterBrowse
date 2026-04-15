@@ -1,6 +1,6 @@
 {
   "name": "betterbrowse",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "CLI-native web app auditor for React and Next.js projects",
   "license": "MIT",
   "engines": {
@@ -34,7 +34,7 @@
     "accessibility"
   ],
   "dependencies": {
-    "@betterbrowse/core": "^0.1.0",
+    "@amac84/betterbrowse-core": "^0.1.1",
     "commander": "^13.1.0"
   },
   "devDependencies": {

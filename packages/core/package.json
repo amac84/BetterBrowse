@@ -1,6 +1,6 @@
 {
-  "name": "@betterbrowse/core",
-  "version": "0.1.1",
+  "name": "@amac84/betterbrowse-core",
+  "version": "0.1.2",
   "description": "Core BetterBrowse auditing engine",
   "license": "MIT",
   "engines": {

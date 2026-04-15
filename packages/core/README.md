@@ -1,4 +1,4 @@
-# @betterbrowse/core
+# @amac84/betterbrowse-core
 
 Core BetterBrowse auditing engine used by the `betterbrowse` CLI.
 
