@@ -52,18 +52,20 @@ jobs:
           fi
 
       - name: Wait for core version to be available
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
           CORE_NAME="$(node -p "require('./packages/core/package.json').name")"
           CORE_VERSION="$(node -p "require('./packages/core/package.json').version")"
-          for attempt in {1..20}; do
-            if npm view "${CORE_NAME}@${CORE_VERSION}" version >/dev/null 2>&1; then
+          for attempt in {1..40}; do
+            if npm view "${CORE_NAME}@${CORE_VERSION}" version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
               echo "${CORE_NAME}@${CORE_VERSION} is available."
               exit 0
             fi
-            echo "Waiting for ${CORE_NAME}@${CORE_VERSION} to propagate to npm (${attempt}/20)..."
-            sleep 15
+            echo "Waiting for ${CORE_NAME}@${CORE_VERSION} to propagate to npm (${attempt}/40)..."
+            sleep 10
           done
           echo "Timed out waiting for ${CORE_NAME}@${CORE_VERSION} to become available on npm."
           exit 1
